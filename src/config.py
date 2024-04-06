@@ -1,10 +1,16 @@
+import pathlib
+
 import pydantic
+
+MAX_DOWNLOAD_TIME = 0.2
+
+IMAGE_DOWNLOAD_PATH = pathlib.Path("/tmp/images")
 
 
 class DataConfig(pydantic.BaseModel):
     buffer_size: int = 1000
-    data_len: int = 100000
-    train_len: int = 90000
+    data_len: int = 100
+    train_len: int = 90
     small_dataset: str = "laion/220k-gpt4vision-captions-from-livis"
     large_dataset: str = "laion/laion400m"
     dataset: str = small_dataset
@@ -16,7 +22,7 @@ class ModelConfig(pydantic.BaseModel):
     projection_layers: int = 3
     embed_dim: int = 256
     transformer_embed_dim: int = 768
-    max_len: int = 77  # maximum length of text in CLIP
+    max_len: int = 128  # 77
     cls_type: bool = True
     freeze_vision_base: bool = False
     freeze_text_base: bool = False
@@ -36,5 +42,5 @@ class TrainerConfig(pydantic.BaseModel):
 
     run_openai_clip: bool = False
 
-    model_config: ModelConfig = ModelConfig()
-    data_config: DataConfig = DataConfig()
+    _model_config: ModelConfig = ModelConfig()
+    _data_config: DataConfig = DataConfig()
