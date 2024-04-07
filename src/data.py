@@ -1,59 +1,44 @@
-import io
 import multiprocessing as mp
-from typing import Optional, Union
+import pathlib
+from typing import Any
 
 import datasets
 from PIL import Image
-import requests
 import torch
 from torch.utils.data import Dataset, DataLoader
 from torchvision import transforms
-from transformers import AutoTokenizer
 
 from src import config
+from src import tokenizer as tk
 
 
-class Tokenizer:
-    def __init__(self, model_name: str, max_len: int) -> None:
-        self.tokenizer = AutoTokenizer.from_pretrained(model_name)
-        self.max_len = max_len
+class CaptionDatset(Dataset):
+    def __init__(self, dataset: datasets.Dataset, img_path: pathlib.Path) -> None:
+        self.dataset = dataset
+        self.img_path = img_path
 
-    def __call__(self, x: Union[str, list[str]]) -> dict[str, torch.LongTensor]:
-        return self.tokenizer(
-            x, max_length=self.max_len, truncation=True, padding=True, return_tensors="pt"
-        )
+    def __len__(self) -> int:
+        return len(self.dataset)
 
-    def decode(self, x: dict[str, torch.LongTensor]) -> list[str]:
-        return [
-            self.tokenizer.decode(sentence[:sentence_len])
-            for sentence, sentence_len in zip(x["input_ids"], x["attention_mask"].sum(axis=-1))
-        ]
-
-
-def _get_image_and_caption(item: dict[str, str]) -> Optional[tuple[Image.Image, str]]:
-    image_url = item["url"]
-    caption = item["caption"]
-    try:
-        response = requests.get(image_url, timeout=1)
-        response.raise_for_status()  # Raise HTTPError for bad responses (4xx and 5xx)
-        image = Image.open(io.BytesIO(response.content))
-        return image, caption
-    except (requests.RequestException, IOError):
-        return None
+    def __getitem__(self, idx: int) -> dict[str, Any]:
+        item = self.dataset[idx]
+        image = Image.open(self.img_path / item["url"].rsplit("/", 1)[-1]).convert("RGB")
+        return {"image": image, "caption": item["short_caption"]}
 
 
 class CollateFn:
-    def __init__(self, tokenizer: Tokenizer, transform: transforms.Compose):
+    def __init__(self, tokenizer: tk.Tokenizer, transform: transforms.Compose):
         self.tokenizer = tokenizer
         self.transform = transform
 
-    def __call__(
-        self, batch: list[Optional[tuple[str, torch.FloatTensor]]]
-    ) -> tuple[dict[str, torch.LongTensor], torch.FloatTensor]:
-        filtered_batch = [data for data in map(_get_image_and_caption, batch) if data is not None]
-        x, y = zip(*filtered_batch)
-        tokenized_text = self.tokenizer(list(x))
-        return tokenized_text, torch.stack([self.transform(image) for image in y])
+    def __call__(self, batch: list[dict[str, Any]]) -> dict[str, torch.Tensor]:
+        stacked_images = torch.stack([self.transform(item["image"]) for item in batch])
+        tokenized_text = self.tokenizer([item["caption"] for item in batch])
+
+        return {
+            "image": stacked_images,
+            **tokenized_text,
+        }
 
 
 def _get_dataloaders(
@@ -65,7 +50,7 @@ def _get_dataloaders(
     common_params = {
         "batch_size": training_config.batch_size,
         "pin_memory": True,
-        "num_workers": mp.cpu_count(),
+        "num_workers": mp.cpu_count() // 3,
         "collate_fn": collate_fn,
     }
     train_loader = DataLoader(
@@ -85,25 +70,39 @@ def _get_dataloaders(
 
 def get_dataset(
     transform: transforms.Compose,
-    tokenizer: Tokenizer,
+    tokenizer: tk.Tokenizer,
     hyper_parameters: config.TrainerConfig,
-    num_workers: int,
 ) -> tuple[DataLoader, DataLoader]:
-    dataset = datasets.load_dataset(
-        hyper_parameters.data_config.dataset, split="train", streaming=True
-    )
-    full_dataset = dataset.shuffle(
-        seed=42, buffer_size=hyper_parameters.data_config.buffer_size
-    ).take(hyper_parameters.data_config.data_len)
-    train_dataset = full_dataset.take(hyper_parameters.data_config.train_len)
-    valid_dataset = full_dataset.skip(hyper_parameters.data_config.train_len)
-
+    dataset: datasets.Dataset = datasets.load_dataset(
+        hyper_parameters._data_config.dataset, split="train"
+    )  # type: ignore
+    train_test_dataset = dataset.train_test_split(seed=42, test_size=0.1)
+    train_ds = CaptionDatset(train_test_dataset["train"], config.IMAGE_DOWNLOAD_PATH)
+    valid_ds = CaptionDatset(train_test_dataset["test"], config.IMAGE_DOWNLOAD_PATH)
     collate_fn = CollateFn(tokenizer, transform)
 
     return _get_dataloaders(
-        train_ds=train_dataset,
-        valid_ds=valid_dataset,
+        train_ds=train_ds,
+        valid_ds=valid_ds,
         training_config=hyper_parameters,
         collate_fn=collate_fn,
-        num_workers=num_workers,
     )
+
+
+if __name__ == "__main__":
+    # do not want to do these imports in general
+    import os
+    from tqdm.auto import tqdm
+
+    os.environ["TOKENIZERS_PARALLELISM"] = "false"
+    hyper_parameters = config.TrainerConfig()
+    transform = transforms.Compose([transforms.Resize((128, 128)), transforms.ToTensor()])
+    tokenizer = tk.Tokenizer(
+        hyper_parameters._model_config.text_model, hyper_parameters._model_config.max_len
+    )
+    train_dl, valid_dl = get_dataset(transform, tokenizer, hyper_parameters)
+
+    for batch in tqdm(train_dl):
+        continue
+
+    print("hellow")

@@ -1,1 +1,7 @@
-{"cls_token": true, "n_projection_layers": 3, "embed_dims": 512, "vision_model": "edgenext_small", "text_model": "microsoft/xtremedistil-l6-h256-uncased"}
+{
+    "cls_token": true,
+    "n_projection_layers": 3,
+    "embed_dims": 512,
+    "vision_model": "edgenext_small",
+    "text_model": "microsoft/xtremedistil-l6-h256-uncased"
+}
