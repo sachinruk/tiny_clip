@@ -102,7 +102,8 @@ if __name__ == "__main__":
     )
     train_dl, valid_dl = get_dataset(transform, tokenizer, hyper_parameters)
 
+    batch = next(iter(train_dl))
+    print({k: v.shape for k, v in batch.items()})  # torch.Size([1, 3, 128, 128])
+
     for batch in tqdm(train_dl):
         continue
-
-    print("hellow")

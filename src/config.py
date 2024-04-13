@@ -4,7 +4,7 @@ import pydantic
 
 MAX_DOWNLOAD_TIME = 0.2
 
-IMAGE_DOWNLOAD_PATH = pathlib.Path("/tmp/images")
+IMAGE_DOWNLOAD_PATH = pathlib.Path("./data/images")
 
 
 class DataConfig(pydantic.BaseModel):
@@ -30,7 +30,7 @@ class ModelConfig(pydantic.BaseModel):
 
 class TrainerConfig(pydantic.BaseModel):
     epochs: int = 20
-    batch_size: int = 256
+    batch_size: int = 64
     learning_rate: float = 5e-4
     accumulate_grad_batches: int = 1
     temperature: float = 1.0
