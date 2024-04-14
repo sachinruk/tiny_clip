@@ -3,17 +3,6 @@ from torch import nn
 import torch.nn.functional as F
 
 
-def metrics(similarity: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor]:
-    y = torch.arange(len(similarity)).to(similarity.device)
-    img2cap_match_idx = similarity.argmax(dim=1)
-    cap2img_match_idx = similarity.argmax(dim=0)
-
-    img_acc = (img2cap_match_idx == y).float().mean()
-    cap_acc = (cap2img_match_idx == y).float().mean()
-
-    return img_acc, cap_acc
-
-
 def get_similarity_matrix(
     image_features: torch.Tensor, text_features: torch.Tensor
 ) -> torch.Tensor:
@@ -34,7 +23,7 @@ class CLIPLoss(nn.Module):
         super().__init__()
         self.logit_temperature = nn.Parameter(torch.tensor(logit_temperature))
 
-    def forward(self, similarity_matrix: torch.Tensor):
+    def forward(self, similarity_matrix: torch.Tensor, *args):
         temperature = self.logit_temperature.sigmoid()
 
         caption_loss = contrastive_loss(similarity_matrix / temperature, dim=0)
@@ -77,7 +66,7 @@ class SigLIPLoss(nn.Module):
         super().__init__()
         self.logit_temperature = nn.Parameter(torch.tensor(logit_temperature))
 
-    def forward(self, similarity_matrix: torch.Tensor):
+    def forward(self, similarity_matrix: torch.Tensor, *args):
         temperature = self.logit_temperature.sigmoid()
         return contrastive_sigmoid_loss(similarity_matrix / temperature)
 
