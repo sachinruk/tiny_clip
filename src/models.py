@@ -119,3 +119,9 @@ class TinyCLIP(PreTrainedModel):
             out["loss"] = self.loss_fn(vision_output, text_output)
 
         return out
+
+
+if __name__ == "__main__":
+    model = TinyCLIP(TinyCLIPConfig())
+    print(model)
+    print("Done!")

@@ -15,7 +15,7 @@ def contrastive_sigmoid_loss(logits):
 class CLIPLoss(nn.Module):
     def __init__(self, logit_temperature: float = -1.0):
         super().__init__()
-        self.logit_temperature = nn.Parameter(logit_temperature)
+        self.logit_temperature = nn.Parameter(torch.tensor(logit_temperature))
 
     def forward(self, image_features: torch.Tensor, text_features: torch.Tensor):
         temperature = self.logit_temperature.sigmoid()
@@ -29,7 +29,7 @@ class CLIPLoss(nn.Module):
 class CyCLIP(nn.Module):
     def __init__(self, logit_temperature: float = -1.0):
         super().__init__()
-        self.logit_temperature = nn.Parameter(logit_temperature)
+        self.logit_temperature = nn.Parameter(torch.tensor(logit_temperature))
         self.lambda_1: float = 1.0
         self.lambda_2: float = 1.0
 
@@ -54,7 +54,7 @@ class CyCLIP(nn.Module):
 class SigLIPLoss(nn.Module):
     def __init__(self, logit_temperature: float = -1.0):
         super().__init__()
-        self.logit_temperature = nn.Parameter(logit_temperature)
+        self.logit_temperature = nn.Parameter(torch.tensor(logit_temperature))
 
     def forward(self, image_features: torch.Tensor, text_features: torch.Tensor):
         temperature = self.logit_temperature.sigmoid()
@@ -65,7 +65,7 @@ class SigLIPLoss(nn.Module):
 class CySigLIPLoss(nn.Module):
     def __init__(self, logit_temperature: float = -1.0):
         super().__init__()
-        self.logit_temperature = nn.Parameter(logit_temperature)
+        self.logit_temperature = nn.Parameter(torch.tensor(logit_temperature))
         self.lambda_1: float = 1.0
         self.lambda_2: float = 1.0
 
