@@ -70,9 +70,7 @@ class TinyCLIPVisionEncoder(PreTrainedModel):
 
     def __init__(self, config: TinyCLIPVisionConfig):
         super().__init__(config)
-        self.base = timm.create_model(config.vision_model, num_classes=0)
-        timm_config = data.resolve_data_config({}, model=self.base)
-        self.transform = data.transforms_factory.create_transform(**timm_config)
+
         self.projection = projection_layers(
             self.base.num_features, config.embed_dims, config.projection_layers
         )
