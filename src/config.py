@@ -101,6 +101,7 @@ class TrainerConfig(pydantic.BaseModel):
     epochs: int = 20
     batch_size: int = 64
     learning_rate: float = 5e-4
+    lr_scheduler: bool = True
     accumulate_grad_batches: int = 1
     temperature: float = 1.0
     vision_freeze_layers: int = 2
