@@ -3,11 +3,13 @@ from typing import Union
 import torch
 from transformers import AutoTokenizer
 
+from src.config import TinyCLIPTextConfig
+
 
 class Tokenizer:
-    def __init__(self, model_name: str, max_len: int) -> None:
-        self.tokenizer = AutoTokenizer.from_pretrained(model_name)
-        self.max_len = max_len
+    def __init__(self, text_config: TinyCLIPTextConfig) -> None:
+        self.tokenizer = AutoTokenizer.from_pretrained(text_config.text_model)
+        self.max_len = text_config.max_len
 
     def __call__(self, x: Union[str, list[str]]) -> dict[str, torch.LongTensor]:
         return self.tokenizer(

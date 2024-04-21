@@ -65,7 +65,7 @@ class TinyCLIPConfig(PretrainedConfig):
         max_len: int = 128,
         cls_type: bool = True,
         freeze_vision_base: bool = False,
-        freeze_text_base: bool = False,
+        freeze_text_base: bool = True,
         loss_type: str = "cyclip",
         **kwargs,
     ):
@@ -85,18 +85,6 @@ class TinyCLIPConfig(PretrainedConfig):
         super().__init__(**kwargs)
 
 
-class ModelConfig(pydantic.BaseModel):
-    text_model: str = "microsoft/xtremedistil-l6-h256-uncased"  # 51 mb
-    vision_model: str = "edgenext_small"  # 20 mb
-    projection_layers: int = 3
-    embed_dim: int = 256
-    transformer_embed_dim: int = 768
-    max_len: int = 128  # 77
-    cls_type: bool = True
-    freeze_vision_base: bool = False
-    freeze_text_base: bool = False
-
-
 class TrainerConfig(pydantic.BaseModel):
     epochs: int = 20
     batch_size: int = 64
@@ -112,5 +100,5 @@ class TrainerConfig(pydantic.BaseModel):
 
     run_openai_clip: bool = False
 
-    _model_config: ModelConfig = ModelConfig()
+    _model_config: TinyCLIPConfig = TinyCLIPConfig()
     _data_config: DataConfig = DataConfig()

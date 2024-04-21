@@ -1,11 +1,20 @@
 import timm
 from timm import data
+import torch.nn as nn
+from torchvision import transforms
 
-from src import config
+from src.config import TinyCLIPVisionConfig
 
 
-def get_vision_base_and_transform(config: config.TrainerConfig):
-    base = timm.create_model(config._model_config.vision_model, num_classes=0)
-    timm_config = data.resolve_data_config({}, model=base)
+def get_vision_base(
+    config: TinyCLIPVisionConfig,
+) -> tuple[nn.Module, int]:
+    base = timm.create_model(config.vision_model, num_classes=0, pretrained=True)
+    num_features = base.num_features
+    return base, num_features
+
+
+def get_vision_transform(config: TinyCLIPVisionConfig) -> transforms.Compose:
+    timm_config = data.resolve_data_config({}, model=config.vision_model)
     transform = data.transforms_factory.create_transform(**timm_config)
-    return base, transform
+    return transform  # type: ignore

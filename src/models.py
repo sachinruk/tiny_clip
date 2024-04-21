@@ -1,14 +1,14 @@
 from PIL import Image
-import timm
-from timm import data
+import transformers
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-import transformers
+
 from transformers import PreTrainedModel
 
 from src.config import TinyCLIPConfig, TinyCLIPTextConfig, TinyCLIPVisionConfig
 from src import loss
+from src import vision_model
 
 
 class Projection(nn.Module):
@@ -70,9 +70,10 @@ class TinyCLIPVisionEncoder(PreTrainedModel):
 
     def __init__(self, config: TinyCLIPVisionConfig):
         super().__init__(config)
-
+        base, num_features = vision_model.get_vision_base(config)
+        self.base = base
         self.projection = projection_layers(
-            self.base.num_features, config.embed_dims, config.projection_layers
+            num_features, config.embed_dims, config.projection_layers
         )
 
     def forward(self, images: list[Image.Image]):
