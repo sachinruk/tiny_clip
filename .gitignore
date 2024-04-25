@@ -2,3 +2,4 @@
 .vscode/
 pyrightconfig.json
 *.jpg
+*.pyc

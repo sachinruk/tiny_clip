@@ -1,11 +1,11 @@
+from functools import partial
 from io import BytesIO
 import pathlib
-from functools import partial
 from typing import Any
 
 import datasets
-from PIL import Image
 from loguru import logger
+from PIL import Image
 import requests
 from tqdm.auto import tqdm
 

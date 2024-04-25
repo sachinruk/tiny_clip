@@ -5,7 +5,8 @@ from typing import Any
 import datasets
 from PIL import Image
 import torch
-from torch.utils.data import Dataset, DataLoader
+from torch.utils.data import DataLoader
+from torch.utils.data import Dataset
 from torchvision import transforms
 
 from src import config
@@ -92,6 +93,7 @@ def get_dataset(
 if __name__ == "__main__":
     # do not want to do these imports in general
     import os
+
     from tqdm.auto import tqdm
 
     os.environ["TOKENIZERS_PARALLELISM"] = "false"

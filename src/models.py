@@ -1,14 +1,15 @@
 from PIL import Image
-import transformers
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-
+import transformers
 from transformers import PreTrainedModel
 
-from src.config import TinyCLIPConfig, TinyCLIPTextConfig, TinyCLIPVisionConfig
 from src import loss
 from src import vision_model
+from src.config import TinyCLIPConfig
+from src.config import TinyCLIPTextConfig
+from src.config import TinyCLIPVisionConfig
 
 
 class Projection(nn.Module):
