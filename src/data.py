@@ -37,7 +37,7 @@ class CollateFn:
         tokenized_text = self.tokenizer([item["caption"] for item in batch])
 
         return {
-            "image": stacked_images,
+            "images": stacked_images,
             **tokenized_text,
         }
 

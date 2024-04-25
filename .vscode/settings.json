@@ -2,7 +2,7 @@
     "files.insertFinalNewline": true,
     "jupyter.debugJustMyCode": false,
     "editor.formatOnSave": true,
-    "editor.formatOnPaste": true,
+    // "editor.formatOnPaste": true,
     "files.autoSave": "onFocusChange",
     "editor.defaultFormatter": "ms-python.black-formatter",
     "black-formatter.path": ["/opt/homebrew/bin/black"],
@@ -12,12 +12,12 @@
     "isort.check": true,
     "python.analysis.typeCheckingMode": "basic",
     "python.defaultInterpreterPath": "/opt/homebrew/bin/python3",
-    "[python]": {
-        "editor.defaultFormatter": "ms-python.black-formatter",
-        "editor.formatOnSave": true,
-        "editor.codeActionsOnSave": {
-            "source.organizeImports": "explicit"
-        },
-    },
-    "isort.args":["--profile", "black"],
+    // "[python]": {
+    //     "editor.defaultFormatter": "ms-python.black-formatter",
+    //     "editor.formatOnSave": true,
+    //     "editor.codeActionsOnSave": {
+    //         "source.organizeImports": "explicit"
+    //     },
+    // },
+    // "isort.args":["--profile", "black"],
 }

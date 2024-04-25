@@ -6,6 +6,14 @@ from transformers import PretrainedConfig
 MAX_DOWNLOAD_TIME = 0.2
 
 IMAGE_DOWNLOAD_PATH = pathlib.Path("./data/images")
+WANDB_LOG_PATH = pathlib.Path("/tmp/wandb_logs")
+
+IMAGE_DOWNLOAD_PATH.mkdir(parents=True, exist_ok=True)
+WANDB_LOG_PATH.mkdir(parents=True, exist_ok=True)
+
+MODEL_NAME = "tiny_clip"
+
+WANDB_ENTITY = "sachinruk"
 
 
 class DataConfig(pydantic.BaseModel):
@@ -97,6 +105,8 @@ class TrainerConfig(pydantic.BaseModel):
     lambda_2: float = 1.0
 
     val_check_interval: int = 1000
+    log_every_n_steps: int = 100
+    debug: bool = False
 
     run_openai_clip: bool = False
 

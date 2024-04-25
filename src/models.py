@@ -77,10 +77,8 @@ class TinyCLIPVisionEncoder(PreTrainedModel):
             num_features, config.embed_dims, config.projection_layers
         )
 
-    def forward(self, images: list[Image.Image]):
-        x: torch.Tensor = torch.stack([self.transform(image) for image in images])  # type: ignore
-
-        projected_vec = self.projection(self.base(x))
+    def forward(self, images: torch.Tensor):
+        projected_vec = self.projection(self.base(images))
         return F.normalize(projected_vec, dim=-1)
 
 

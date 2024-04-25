@@ -24,10 +24,11 @@ class LightningModule(pl.LightningModule):
         self.hyper_parameters = hyper_parameters
         self.len_train_dl = len_train_dl
 
-    def common_step(self, batch: tuple[torch.Tensor, list[str]], step_kind: str) -> torch.Tensor:
-        text, images = batch
-        image_features = self.vision_encoder(images)
-        text_features = self.text_encoder(text)
+    def common_step(self, batch: dict[str, torch.Tensor], step_kind: str) -> torch.Tensor:
+        image_features = self.vision_encoder(batch["images"])
+        text_features = self.text_encoder(
+            {key: value for key, value in batch.items() if key != "images"}
+        )
         similarity_matrix = loss_utils.get_similarity_matrix(image_features, text_features)
 
         loss = self.loss_fn(similarity_matrix, image_features, text_features)
@@ -51,10 +52,6 @@ class LightningModule(pl.LightningModule):
             {
                 "params": self.vision_encoder.projection.parameters(),
                 "lr": self.hyper_parameters.learning_rate,
-            },
-            {
-                "params": self.vision_encoder.base.parameters(),
-                "lr": self.hyper_parameters.learning_rate / 2,
             },
         ]
         caption_params = [
