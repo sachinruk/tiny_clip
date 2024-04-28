@@ -7,9 +7,11 @@ MAX_DOWNLOAD_TIME = 0.2
 
 IMAGE_DOWNLOAD_PATH = pathlib.Path("./data/images")
 WANDB_LOG_PATH = pathlib.Path("/tmp/wandb_logs")
+MODEL_PATH = pathlib.Path("/tmp/models")
 
 IMAGE_DOWNLOAD_PATH.mkdir(parents=True, exist_ok=True)
 WANDB_LOG_PATH.mkdir(parents=True, exist_ok=True)
+MODEL_PATH.mkdir(parents=True, exist_ok=True)
 
 MODEL_NAME = "tiny_clip"
 
