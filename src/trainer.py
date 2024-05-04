@@ -1,5 +1,8 @@
 import os
 
+from huggingface_hub import HfApi
+from loguru import logger
+
 from src import config
 from src import data
 from src import loss
@@ -11,22 +14,38 @@ from src.lightning_module import LightningModule
 
 
 def _upload_model_to_hub(
-    vision_encoder: models.TinyCLIPVisionEncoder, text_encoder: models.TinyCLIPTextEncoder
+    vision_encoder: models.TinyCLIPVisionEncoder,
+    text_encoder: models.TinyCLIPTextEncoder,
+    debug: bool = False,
 ):
     vision_encoder.save_pretrained(
-        str(config.MODEL_PATH),
-        variant="vision_encoder",
+        str(config.VISION_MODEL_PATH),
         safe_serialization=True,
-        push_to_hub=True,
-        repo_id="debug-clip-model",
     )
     text_encoder.save_pretrained(
-        str(config.MODEL_PATH),
-        variant="text_encoder",
+        str(config.TEXT_MODEL_PATH),
         safe_serialization=True,
-        push_to_hub=True,
-        repo_id="debug-clip-model",
     )
+
+    api = HfApi()
+    if debug:
+        repo_components = config.REPO_ID.split("/", maxsplit=1)
+        repo_components[1] = f"debug-{repo_components[1]}"
+        repo_id = "/".join(repo_components)
+    else:
+        repo_id = config.REPO_ID
+    common_hf_api_params = {
+        "repo_id": repo_id,
+        "repo_type": "model",
+    }
+    if not api.repo_exists(**common_hf_api_params):
+        logger.info(f"Creating repo {repo_id} on Hugging Face Hub.")
+        api.create_repo(**common_hf_api_params)  # type: ignore
+    logger.info(f"Uploading models in {str(config.MODEL_PATH)} to {repo_id}.")
+    api.upload_folder(
+        folder_path=config.MODEL_PATH,
+        **common_hf_api_params,  # type: ignore
+    )  # type: ignore
 
 
 def train(trainer_config: config.TrainerConfig):
@@ -51,7 +70,7 @@ def train(trainer_config: config.TrainerConfig):
     trainer = utils.get_trainer(trainer_config)
     trainer.fit(lightning_module, train_dl, valid_dl)
 
-    _upload_model_to_hub(vision_encoder, text_encoder)
+    _upload_model_to_hub(vision_encoder, text_encoder, trainer_config.debug)
 
 
 if __name__ == "__main__":

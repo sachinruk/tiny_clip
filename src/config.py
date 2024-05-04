@@ -8,12 +8,17 @@ MAX_DOWNLOAD_TIME = 0.2
 IMAGE_DOWNLOAD_PATH = pathlib.Path("./data/images")
 WANDB_LOG_PATH = pathlib.Path("/tmp/wandb_logs")
 MODEL_PATH = pathlib.Path("/tmp/models")
+VISION_MODEL_PATH = MODEL_PATH / "vision"
+TEXT_MODEL_PATH = MODEL_PATH / "text"
 
 IMAGE_DOWNLOAD_PATH.mkdir(parents=True, exist_ok=True)
 WANDB_LOG_PATH.mkdir(parents=True, exist_ok=True)
 MODEL_PATH.mkdir(parents=True, exist_ok=True)
+VISION_MODEL_PATH.mkdir(parents=True, exist_ok=True)
+TEXT_MODEL_PATH.mkdir(parents=True, exist_ok=True)
 
 MODEL_NAME = "tiny_clip"
+REPO_ID = "sachin/clip-model"
 
 WANDB_ENTITY = "sachinruk"
 
