@@ -99,6 +99,16 @@ class TinyCLIPConfig(PretrainedConfig):
         self.loss_type = loss_type
         super().__init__(**kwargs)
 
+    @classmethod
+    def from_dict(cls, config_dict, **kwargs):
+        text_config_dict = config_dict.pop("text_config", {})
+        text_config = TinyCLIPTextConfig.from_dict(text_config_dict)
+
+        vision_config_dict = config_dict.pop("vision_config", {})
+        vision_config = TinyCLIPVisionConfig.from_dict(vision_config_dict)
+
+        return cls(text_config=text_config, vision_config=vision_config, **config_dict, **kwargs)
+
 
 class TrainerConfig(pydantic.BaseModel):
     epochs: int = 20
@@ -119,3 +129,8 @@ class TrainerConfig(pydantic.BaseModel):
 
     _model_config: TinyCLIPConfig = TinyCLIPConfig()
     _data_config: DataConfig = DataConfig()
+
+    def __init__(self, **data):
+        super().__init__(**data)
+        if "_model_config" in data:
+            self._model_config = TinyCLIPConfig.from_dict(data["_model_config"])
