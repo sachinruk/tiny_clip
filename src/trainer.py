@@ -1,5 +1,6 @@
 import os
 
+import click
 from huggingface_hub import HfApi
 from loguru import logger
 
@@ -48,9 +49,17 @@ def _upload_model_to_hub(
     )  # type: ignore
 
 
-def train(trainer_config: config.TrainerConfig):
+@click.group()
+def cli():
+    pass
+
+
+@click.command()
+@click.option("--trainer-config-json", required=False, default="{}", type=str)
+def train(trainer_config_json: str):
     if "HF_TOKEN" not in os.environ:
         raise ValueError("Please set the HF_TOKEN environment variable.")
+    trainer_config = config.TrainerConfig.model_validate_json(trainer_config_json)
     transform = vision_model.get_vision_transform(trainer_config._model_config.vision_config)
     tokenizer = tk.Tokenizer(trainer_config._model_config.text_config)
     train_dl, valid_dl = data.get_dataset(
@@ -73,6 +82,7 @@ def train(trainer_config: config.TrainerConfig):
     _upload_model_to_hub(vision_encoder, text_encoder, trainer_config.debug)
 
 
+cli.add_command(train)
+
 if __name__ == "__main__":
-    trainer_config = config.TrainerConfig(debug=True)
-    train(trainer_config)
+    cli()
