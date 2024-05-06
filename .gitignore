@@ -4,3 +4,8 @@ pyrightconfig.json
 *.jpg
 *.pyc
 .env
+*.parquet
+*.json
+*.tar
+*.feather
+*.tar.gz
