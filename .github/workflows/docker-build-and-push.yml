@@ -27,6 +27,8 @@ jobs:
       uses: docker/build-push-action@v2
       with:
         push: true
+        file: ./aws/Dockerfile
+        context: ./
         tags: ${{ secrets.DOCKER_USERNAME }}/imgdataset:latest,${{ secrets.DOCKER_USERNAME }}/imgdataset:${{ github.sha }}
 
     - name: Output image name
