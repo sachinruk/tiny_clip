@@ -33,4 +33,4 @@ jobs:
 
     - name: Output image name
       run: |
-        echo "Image URI: ${secrets.DOCKER_USERNAME}/imgdataset:${{ github.sha }}"
+        echo "Image URI: ${{ secrets.DOCKER_USERNAME }}/imgdataset:${{ github.sha }}"
