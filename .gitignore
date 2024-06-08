@@ -5,7 +5,8 @@ pyrightconfig.json
 *.pyc
 .env
 *.parquet
-*.json
 *.tar
 *.feather
 *.tar.gz
+*stats.json
+*-all.json

@@ -100,7 +100,7 @@ if __name__ == "__main__":
     hyper_parameters = config.TrainerConfig()
     transform = transforms.Compose([transforms.Resize((128, 128)), transforms.ToTensor()])
     tokenizer = tk.Tokenizer(
-        hyper_parameters._model_config.text_model, hyper_parameters._model_config.max_len
+        hyper_parameters._model_config.text_config,
     )
     train_dl, valid_dl = get_dataset(transform, tokenizer, hyper_parameters)
 
