@@ -28,7 +28,7 @@ jobs:
       with:
         push: true
         file: ./data/Dockerfile
-        context: ./aws
+        context: ./data
         tags: ${{ secrets.DOCKER_USERNAME }}/imgdataset:latest,${{ secrets.DOCKER_USERNAME }}/imgdataset:${{ github.sha }}
 
     - name: Output image name
