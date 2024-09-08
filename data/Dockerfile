@@ -18,5 +18,8 @@ WORKDIR /app
 
 COPY ./download_cc3m.sh /app/download_cc3m.sh
 
-# Set default command (optional, change if you want a specific entry point)
-CMD ["bash", "download_cc3m.sh"]
+# Ensure the script has executable permissions
+RUN chmod +x /app/download_cc3m.sh
+
+# Set default command to run the script
+CMD ["bash", "/app/download_cc3m.sh"]
